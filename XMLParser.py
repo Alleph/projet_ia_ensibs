@@ -6,26 +6,30 @@ class XMLParser:
         self.xml_file = xml_file
         self.tree = None
 
-    # A method to load the XML file into memory
+    # A method to stock all flows in self.tree
     def load_xml(self):
         try:
-            self.tree = etree.parse(self.xml_file)
+            context = etree.iterparse(self.xml_file, events=('start',))
+            self.tree = []
+            tag_to_parse = None
+            for event, elem in context:
+                if tag_to_parse is None and elem.tag != 'dataroot':
+                    tag_to_parse = elem.tag
+                if elem.tag == tag_to_parse:
+                    self.tree.append(self.element_to_dict(elem))
+                    elem.clear()
         except Exception as e:
             raise Exception(f"Error loading XML file: {str(e)}")
+
+    # A method to extract flow data from self.tree
+    def get_flows(self):
+        if self.tree is None:
+            raise Exception("XML file not loaded")
+        return self.tree
 
     # A method to convert an XML element to a dictionary
     def element_to_dict(self, element):
         result = {}
-        for child in element.iterchildren():
+        for child in element.iterdescendants():
             result[child.tag] = child.text
         return result
-
-    # A method to extract the flow data from the XML file
-    def extract_flow_data(self):
-        if self.tree is None:
-            raise Exception("XML file not loaded. Call load_xml() first.")
-
-        # get the next element after <dataroot>
-        flow_elements = self.tree.xpath(self.tree.getroot()[0].tag)
-
-        return [self.element_to_dict(flow) for flow in flow_elements]

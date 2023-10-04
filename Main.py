@@ -1,4 +1,4 @@
-from BulkData import ElasticsearchBulkIndexer as ebi
+from ElasticSearchBulkIndexer import ElasticSearchBulkIndexer as ebi
 from XMLParser import XMLParser
 import pprint
 import os
@@ -30,7 +30,7 @@ def main():
     for xml_file in XML_FILES:
         print(f"Indexing {xml_file} . . .")
         # Index the XML file
-        bulk_indexer.index_data(xml_file)
+        bulk_indexer.bulk_index_data(xml_file)
 
 if __name__ == "__main__":
     main()
