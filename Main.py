@@ -1,5 +1,6 @@
 from ElasticSearchBulkIndexer import ElasticSearchBulkIndexer as ebi
 from XMLParser import XMLParser
+from SearchingFunctions import SearchingFunctions
 import pprint
 import os
 import glob
@@ -27,11 +28,23 @@ def main():
         ELASTIC_USERNAME, 
         ELASTIC_PASSWORD)
 
-    for xml_file in XML_FILES:
-        print(f"Indexing {xml_file} . . .")
-        # Index the XML file
-        bulk_indexer.bulk_index_data(xml_file)
+    # Delete all indexes at the beginning
+    # bulk_indexer.delete_all_indexes()
+
+    xml_file = XML_FILES[0]
+    print(f"Indexing {xml_file} . . .")
+    # Index the XML file
+    bulk_indexer.bulk_index_data(xml_file)
+
+    # Init searching functions
+    sf = SearchingFunctions(bulk_indexer.es, "flows")
+
+    # If you want to get all the indexes
+    # sf.get_all_indexes()
+
+    # If you want to get all the flows
+    print(sf.match_all())
+
 
 if __name__ == "__main__":
     main()
-

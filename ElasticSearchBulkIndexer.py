@@ -1,6 +1,8 @@
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
+from elasticsearch.exceptions import ElasticsearchWarning
 from XMLParser import XMLParser
+import warnings
 import os
 
 class ElasticSearchBulkIndexer:
@@ -38,18 +40,43 @@ class ElasticSearchBulkIndexer:
         # Prepare a list of actions for bulk indexing
         actions = []
         for flow in flow_data:
+            #print(flow)
             action = {
-                "_index": xml_filename,
-                "_source": {
-                    'data': flow,
-                    'origin': xml_filename  # Store the origin (file name) as a field
-                }
+                "_index": "flows"
             }
+            for key, value in flow.items():
+                action[key] = value
             actions.append(action)
 
         # Bulk index the flow data
         success, _ = bulk(self.es, actions)
 
         print(f"Successfully indexed {success} flows")
-    
+
+    def delete_index(self, index_name):
+        self.es.indices.delete(index=index_name, ignore=[400, 404])
+
+    def delete_all_indexes(self):
+        try:
+            warnings.filterwarnings("ignore", category=ElasticsearchWarning)
+
+            # Get a list of all aliases without fetching the actual system indices
+            response = self.es.indices.get_alias(index="*")
+
+            # List of system indices to exclude from deletion
+            system_indices = [".security-7"]
+
+            # Filter out system indices from the list
+            indexes_to_delete = [index for index in response.keys() if index not in system_indices]
+
+            # Delete non-system indexes
+            for index in indexes_to_delete:
+                self.es.indices.delete(index=index)
+                print(f"Index {index} deleted successfully.")
+
+            print("Indexes deleted successfully (except system indices).")
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        
             

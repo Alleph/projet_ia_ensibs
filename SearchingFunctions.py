@@ -1,30 +1,50 @@
+from elasticsearch import Elasticsearch
+
 class SearchingFunctions:
     def __init__(self, es, index_name):
         self.es = es
         self.index_name = index_name.lower()
 
-    def get_distinct_protocols(self):
-        body = {
-            "aggs": {
-                "distinct_protocols": {
-                    "terms": {
-                        "field": "protocolName.keyword",
-                        "size": 10000
-                    }
-                }
-            },
-            "size": 0
-        }
-        res = self.es.search(index=self.index_name, body=body)
-        return [bucket['key'] for bucket in res['aggregations']['distinct_protocols']['buckets']]
+    # Get all indexes except the .security-7 index
+    def get_all_indexes(self):
+        # Get a list of all aliases without fetching the actual system indices
+        response = self.es.indices.get_alias(index="*")
 
-    def get_flows_for_protocol(self, protocol):
+        # List of system indices to exclude from deletion
+        system_indices = [".security-7"]
+
+        # Filter out system indices from the list
+        indexes = [index for index in response.keys() if index not in system_indices]
+
+        # Print the indexes
+        print("Indexes:")
+        for index in indexes:
+            print(f"  - {index}")
+        
+        return indexes
+
+    # match all request
+    def match_all(self):
         body = {
             "query": {
-                "match": {
-                    "protocolName": protocol
+                "match_all": {}
+            }
+        }
+        return self.es.search(index=self.index_name, body=body)
+
+    # Get all distinct protocols
+    def get_distinct_protocols(self):
+        body = {
+            "query": {
+                "term": {
+                    "_id": "3cwpEYsBKAiTPrbnaN5h"
                 }
             }
         }
-        res = self.es.search(index=self.index_name, body=body)
-        return res['hits']['hits']
+
+        body2 = {
+            "query": {
+                "match_all": {}
+            }
+        }
+        return self.es.search(index=self.index_name, body=body2)
