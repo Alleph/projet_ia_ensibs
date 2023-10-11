@@ -22,6 +22,8 @@ class ElasticSearchBulkIndexer:
         print("Connection to ElasticSearch server successful !")
 
     def bulk_index_data(self, xml_filename):
+
+        print(f"Indexing {xml_filename} . . .")
             
         # Create an XMLParser object
         xml_parser = XMLParser(xml_filename)

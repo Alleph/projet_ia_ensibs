@@ -32,19 +32,17 @@ class SearchingFunctions:
         }
         return self.es.search(index=self.index_name, body=body)
 
-    # Get all distinct protocols
-    def get_distinct_protocols(self):
+    # get the list of all the distinct protocols contained in XML files (the protocol field is named "protocolName" in the index)
+    def get_protocols(self):
         body = {
-            "query": {
-                "term": {
-                    "_id": "3cwpEYsBKAiTPrbnaN5h"
+            "size": 0,
+            "aggs": {
+                "distinct_protocols": {
+                    "terms": {
+                        "field": "protocolName.keyword",
+                        "size": 100
+                    }
                 }
             }
         }
-
-        body2 = {
-            "query": {
-                "match_all": {}
-            }
-        }
-        return self.es.search(index=self.index_name, body=body2)
+        return self.es.search(index=self.index_name, body=body)

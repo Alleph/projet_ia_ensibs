@@ -29,12 +29,12 @@ def main():
         ELASTIC_PASSWORD)
 
     # Delete all indexes at the beginning
-    # bulk_indexer.delete_all_indexes()
+    #bulk_indexer.delete_all_indexes()
 
     xml_file = XML_FILES[0]
-    print(f"Indexing {xml_file} . . .")
+    
     # Index the XML file
-    bulk_indexer.bulk_index_data(xml_file)
+    #bulk_indexer.bulk_index_data(xml_file)
 
     # Init searching functions
     sf = SearchingFunctions(bulk_indexer.es, "flows")
@@ -43,7 +43,7 @@ def main():
     # sf.get_all_indexes()
 
     # If you want to get all the flows
-    print(sf.match_all())
+    print(sf.get_protocols())
 
 
 if __name__ == "__main__":
