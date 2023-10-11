@@ -4,6 +4,7 @@ from SearchingFunctions import SearchingFunctions
 import pprint
 import os
 import glob
+import time
 
 # Constants for the Elasticsearch connection
 PROTOCOL = "https"
@@ -29,12 +30,15 @@ def main():
         ELASTIC_PASSWORD)
 
     # Delete all indexes at the beginning
-    #bulk_indexer.delete_all_indexes()
+    bulk_indexer.delete_all_indexes()
 
-    xml_file = XML_FILES[0]
+    xml_file = XML_FILES[1]
     
     # Index the XML file
-    #bulk_indexer.bulk_index_data(xml_file)
+    bulk_indexer.bulk_index_data(xml_file)
+
+    # Wait few seconds for the indexing to be done
+    time.sleep(5)
 
     # Init searching functions
     sf = SearchingFunctions(bulk_indexer.es, "flows")
@@ -52,14 +56,28 @@ def main():
     #pprint.pprint(sf.get_flows_for_protocol("tcp_ip"))
 
     # If you want to get the number of flows for each protocol
-    # pprint.pprint(sf.get_nb_flows_for_each_protocol())
+    #pprint.pprint(sf.get_nb_flows_for_each_protocol())
 
     # If you want to get the source and destination Payload size for each protocol
     #pprint.pprint(sf.get_payload_size_for_each_protocol())
 
     # If you want to get the source and destination total bytes for each protocol
-    pprint.pprint(sf.get_total_bytes_for_each_protocol())
+    #pprint.pprint(sf.get_total_bytes_for_each_protocol())
 
+    # If you want to get the total source/destination packets for each protocol
+    #pprint.pprint(sf.get_total_packets_for_each_protocol())
+
+    # If you want to  get the list of all the distinct applications
+    #pprint.pprint(sf.get_applications())
+
+    # If you want to get the list of flows for a given application
+    #pprint.pprint(sf.get_flows_for_application("Unknown_UDP"))
+
+    # If you want to get the number of flows for each application
+    #pprint.pprint(sf.get_nb_flows_for_each_application())
+
+    # It you want to get the source and destination Payload size for each application
+    #pprint.pprint(sf.get_payload_size_for_each_application())
 
 if __name__ == "__main__":
     main()
