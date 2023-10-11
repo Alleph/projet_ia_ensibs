@@ -40,10 +40,25 @@ def main():
     sf = SearchingFunctions(bulk_indexer.es, "flows")
 
     # If you want to get all the indexes
-    # sf.get_all_indexes()
+    #sf.get_all_indexes()
 
     # If you want to get all the flows
-    print(sf.get_protocols())
+    #pprint.pprint(sf.match_all())
+
+    # If you want to get all the protocols
+    #pprint.pprint(sf.get_protocols())
+
+    # If you want to get all the flows for a given protocol
+    #pprint.pprint(sf.get_flows_for_protocol("tcp_ip"))
+
+    # If you want to get the number of flows for each protocol
+    # pprint.pprint(sf.get_nb_flows_for_each_protocol())
+
+    # If you want to get the source and destination Payload size for each protocol
+    #pprint.pprint(sf.get_payload_size_for_each_protocol())
+
+    # If you want to get the source and destination total bytes for each protocol
+    pprint.pprint(sf.get_total_bytes_for_each_protocol())
 
 
 if __name__ == "__main__":
