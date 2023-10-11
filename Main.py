@@ -1,6 +1,7 @@
 from ElasticSearchBulkIndexer import ElasticSearchBulkIndexer as ebi
 from XMLParser import XMLParser
 from SearchingFunctions import SearchingFunctions
+from Drawer import Drawer
 import pprint
 import os
 import glob
@@ -30,18 +31,21 @@ def main():
         ELASTIC_PASSWORD)
 
     # Delete all indexes at the beginning
-    bulk_indexer.delete_all_indexes()
+    #bulk_indexer.delete_all_indexes()
 
     xml_file = XML_FILES[1]
     
     # Index the XML file
-    bulk_indexer.bulk_index_data(xml_file)
+    #bulk_indexer.bulk_index_data(xml_file)
 
     # Wait few seconds for the indexing to be done
     time.sleep(5)
 
     # Init searching functions
     sf = SearchingFunctions(bulk_indexer.es, "flows")
+
+    # Init the drawer
+    drawer = Drawer(bulk_indexer.es, sf, "flows")
 
     # If you want to get all the indexes
     #sf.get_all_indexes()
@@ -50,34 +54,62 @@ def main():
     #pprint.pprint(sf.match_all())
 
     # If you want to get all the protocols
-    #pprint.pprint(sf.get_protocols())
+    #protocols = sf.get_protocols()
+    #pprint.pprint(protocols)
 
     # If you want to get all the flows for a given protocol
-    #pprint.pprint(sf.get_flows_for_protocol("tcp_ip"))
+    #protocol = "tcp_ip"
+    #flows_by_protocol = sf.get_flows_for_protocol(protocol)
+    #pprint.pprint(flows_by_protocol)
 
     # If you want to get the number of flows for each protocol
-    #pprint.pprint(sf.get_nb_flows_for_each_protocol())
+    #nb_flows_per_protocol = sf.get_nb_flows_for_each_protocol()
+    #pprint.pprint(nb_flows_per_protocol)
 
     # If you want to get the source and destination Payload size for each protocol
-    #pprint.pprint(sf.get_payload_size_for_each_protocol())
+    #payload_size_per_protocol = sf.get_payload_size_for_each_protocol()
+    #pprint.pprint(payload_size_per_protocol)
 
     # If you want to get the source and destination total bytes for each protocol
-    #pprint.pprint(sf.get_total_bytes_for_each_protocol())
+    #total_bytes_per_protocol = sf.get_total_bytes_for_each_protocol()
+    #pprint.pprint(total_bytes_per_protocol)
 
     # If you want to get the total source/destination packets for each protocol
-    #pprint.pprint(sf.get_total_packets_for_each_protocol())
+    #total_packets_per_protocol = sf.get_total_packets_for_each_protocol()
+    #pprint.pprint(total_packets_per_protocol)
 
     # If you want to  get the list of all the distinct applications
-    #pprint.pprint(sf.get_applications())
+    #applications = sf.get_applications()
+    #pprint.pprint(applications)
 
     # If you want to get the list of flows for a given application
-    #pprint.pprint(sf.get_flows_for_application("Unknown_UDP"))
+    #application = "Unknown_UDP"
+    #flows_by_application = sf.get_flows_for_application(application)
+    #pprint.pprint(flows_by_application)
 
     # If you want to get the number of flows for each application
-    #pprint.pprint(sf.get_nb_flows_for_each_application())
+    #nb_flows_per_application = sf.get_nb_flows_for_each_application()
+    #pprint.pprint(nb_flows_per_application)
 
     # It you want to get the source and destination Payload size for each application
-    #pprint.pprint(sf.get_payload_size_for_each_application())
+    #payload_size_per_application = sf.get_payload_size_for_each_application()
+    #pprint.pprint(payload_size_per_application)
+
+    # If you want to get the source and destination total bytes for each application
+    #total_bytes_per_application = sf.get_total_bytes_for_each_application()
+    #pprint.pprint(total_bytes_per_application)
+
+    # If you want to get the total source/destination packets for each application
+    #total_packets_per_application = sf.get_total_packets_for_each_application()
+    #pprint.pprint(total_packets_per_application)
+
+    # If you want to get the number of flows for each number of packets
+    #nb_flows_for_each_nb_packets = sf.get_nb_flows_for_each_nb_packets()
+    #pprint.pprint(nb_flows_for_each_nb_packets)
+
+    # Draw the Zipf's law for the number of packets
+    drawer.draw_zipf_for_each_nb_packets()
+
 
 if __name__ == "__main__":
     main()

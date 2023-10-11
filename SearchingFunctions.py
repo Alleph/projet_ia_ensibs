@@ -396,3 +396,142 @@ class SearchingFunctions:
             res["destination_payload_size"] = relevant_destination_stats
 
         return list_of_stats
+
+    # get the total source/destination Bytes for each application
+    def get_total_bytes_for_each_application(self):
+        print("Get total bytes for each application")
+        body = {
+            "size": 0,
+            "aggs": {
+                "total_bytes_for_each_application": {
+                    "terms": {
+                        "field": "appName.keyword",
+                        "size": 100
+                    },
+                    "aggs": {
+                        "source_payload_size": {
+                            "extended_stats": {
+                                "script": {
+                                    "source": "Integer.parseInt(doc['totalSourceBytes.keyword'].value)"
+                                }
+                            }
+                        }, 
+                        "destination_payload_size": {
+                            "extended_stats": {
+                                "script": {
+                                    "source": "Integer.parseInt(doc['totalDestinationBytes.keyword'].value)"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        result = self.es.search(index=self.index_name, body=body)
+
+        # Extract the relevant statistics
+        list_of_stats = result["aggregations"]["total_bytes_for_each_application"]["buckets"]
+        for res in list_of_stats:
+            relevant_source_stats = {
+                "avg": res["source_payload_size"]["avg"],
+                "min": res["source_payload_size"]["min"],
+                "max": res["source_payload_size"]["max"],
+                "sum": res["source_payload_size"]["sum"],
+                "std_deviation": res["source_payload_size"]["std_deviation"]
+            }
+            relevant_destination_stats = {
+                "avg": res["destination_payload_size"]["avg"],
+                "min": res["destination_payload_size"]["min"],
+                "max": res["destination_payload_size"]["max"],
+                "sum": res["destination_payload_size"]["sum"],
+                "std_deviation": res["destination_payload_size"]["std_deviation"]
+            }
+
+            res["source_payload_size"] = relevant_source_stats
+            res["destination_payload_size"] = relevant_destination_stats
+
+        return list_of_stats
+
+    # get the total source/destination packets for each application
+    def get_total_packets_for_each_application(self):
+        print("Get total packets for each application")
+        body = {
+            "size": 0,
+            "aggs": {
+                "total_packets_for_each_application": {
+                    "terms": {
+                        "field": "appName.keyword",
+                        "size": 100
+                    },
+                    "aggs": {
+                        "source_payload_size": {
+                            "extended_stats": {
+                                "script": {
+                                    "source": "Integer.parseInt(doc['totalSourceBytes.keyword'].value)"
+                                }
+                            }
+                        }, 
+                        "destination_payload_size": {
+                            "extended_stats": {
+                                "script": {
+                                    "source": "Integer.parseInt(doc['totalDestinationBytes.keyword'].value)"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        result = self.es.search(index=self.index_name, body=body)
+
+        # Extract the relevant statistics
+        list_of_stats = result["aggregations"]["total_packets_for_each_application"]["buckets"]
+        for res in list_of_stats:
+            relevant_source_stats = {
+                "avg": res["source_payload_size"]["avg"],
+                "min": res["source_payload_size"]["min"],
+                "max": res["source_payload_size"]["max"],
+                "sum": res["source_payload_size"]["sum"],
+                "std_deviation": res["source_payload_size"]["std_deviation"]
+            }
+            relevant_destination_stats = {
+                "avg": res["destination_payload_size"]["avg"],
+                "min": res["destination_payload_size"]["min"],
+                "max": res["destination_payload_size"]["max"],
+                "sum": res["destination_payload_size"]["sum"],
+                "std_deviation": res["destination_payload_size"]["std_deviation"]
+            }
+
+            res["source_payload_size"] = relevant_source_stats
+            res["destination_payload_size"] = relevant_destination_stats
+
+        return list_of_stats
+
+    # get the number of flows for each number of packets
+    def get_nb_flows_for_each_nb_packets(self):
+        print("Get number of flows for each number of packets")
+        body = {
+            "size": 0,
+            "aggs": {
+                "nb_flows_for_each_nb_source_packets": {
+                    "terms": {
+                        "field": "totalSourcePackets.keyword",
+                        "size": 100
+                    }
+                },
+                "nb_flows_for_each_nb_destination_packets": {
+                    "terms": {
+                        "field": "totalDestinationPackets.keyword",
+                        "size": 100
+                    }
+                }
+            }
+        }
+
+        res = self.es.search(index=self.index_name, body=body)
+        source = res["aggregations"]["nb_flows_for_each_nb_source_packets"]["buckets"]
+        destination = res["aggregations"]["nb_flows_for_each_nb_destination_packets"]["buckets"]
+
+        return source, destination
