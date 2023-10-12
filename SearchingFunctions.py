@@ -535,3 +535,30 @@ class SearchingFunctions:
         destination = res["aggregations"]["nb_flows_for_each_nb_destination_packets"]["buckets"]
 
         return source, destination
+
+    # get the number of flows for each sourceTCPFlagsDescription and destinationTCPFlagsDescription
+    def get_nb_flows_for_each_tcp_flags(self):
+        print("Get number of flows for each TCP flags")
+        body = {
+            "size": 0,
+            "aggs": {
+                "nb_flows_for_each_source_tcp_flags": {
+                    "terms": {
+                        "field": "sourceTCPFlagsDescription.keyword",
+                        "size": 100
+                    }
+                },
+                "nb_flows_for_each_destination_tcp_flags": {
+                    "terms": {
+                        "field": "destinationTCPFlagsDescription.keyword",
+                        "size": 100
+                    }
+                }
+            }
+        }
+
+        res = self.es.search(index=self.index_name, body=body)
+        source = res["aggregations"]["nb_flows_for_each_source_tcp_flags"]["buckets"]
+        destination = res["aggregations"]["nb_flows_for_each_destination_tcp_flags"]["buckets"]
+
+        return source, destination

@@ -1,5 +1,6 @@
 from ElasticSearchBulkIndexer import ElasticSearchBulkIndexer as ebi
 from XMLParser import XMLParser
+from Converter import Converter
 from SearchingFunctions import SearchingFunctions
 from Drawer import Drawer
 import pprint
@@ -33,7 +34,9 @@ def main():
     # Delete all indexes at the beginning
     #bulk_indexer.delete_all_indexes()
 
-    xml_file = XML_FILES[1]
+    #for xml_file in XML_FILES:
+        # Index the XML file
+        #bulk_indexer.bulk_index_data(xml_file)
     
     # Index the XML file
     #bulk_indexer.bulk_index_data(xml_file)
@@ -54,8 +57,8 @@ def main():
     #pprint.pprint(sf.match_all())
 
     # If you want to get all the protocols
-    #protocols = sf.get_protocols()
-    #pprint.pprint(protocols)
+    protocols = sf.get_protocols()
+    pprint.pprint(protocols)
 
     # If you want to get all the flows for a given protocol
     #protocol = "tcp_ip"
@@ -107,9 +110,15 @@ def main():
     #nb_flows_for_each_nb_packets = sf.get_nb_flows_for_each_nb_packets()
     #pprint.pprint(nb_flows_for_each_nb_packets)
 
-    # Draw the Zipf's law for the number of packets
-    drawer.draw_zipf_for_each_nb_packets()
+    # If you want to get the number of flows for each tcp flags
+    #nb_flows_for_each_tcp_flags = sf.get_nb_flows_for_each_tcp_flags()
+    #pprint.pprint(nb_flows_for_each_tcp_flags)
 
+    # Draw the Zipf's law for the number of packets
+    #drawer.draw_zipf_for_each_nb_packets()
+
+    # Init the converter
+    cv = Converter(bulk_indexer.es, sf, "flows")
 
 if __name__ == "__main__":
     main()
