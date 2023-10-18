@@ -22,6 +22,10 @@ XML_FILES = glob.glob(os.path.join(XML_DIR, "*.xml"))
 
 def main():
 
+    ###------------------------------------------------------------------------------------------###
+    ###----------- Start indexation and initialize researcher, drawer and converter -------------###
+    ###------------------------------------------------------------------------------------------###
+
     # Create an ElasticsearchBulkIndexer object
     bulk_indexer = ebi(
         PROTOCOL, 
@@ -34,11 +38,12 @@ def main():
     # Delete all indexes at the beginning
     #bulk_indexer.delete_all_indexes()
 
+    # Index all the XML files
     #for xml_file in XML_FILES:
-        # Index the XML file
-        #bulk_indexer.bulk_index_data(xml_file)
+    #    bulk_indexer.bulk_index_data(xml_file)
     
-    # Index the XML file
+    # Index only one XML file
+    #xml_file = XML_FILES[0]
     #bulk_indexer.bulk_index_data(xml_file)
 
     # Wait few seconds for the indexing to be done
@@ -50,6 +55,13 @@ def main():
     # Init the drawer
     drawer = Drawer(bulk_indexer.es, sf, "flows")
 
+    # Init the converter
+    cv = Converter(bulk_indexer.es, sf, "flows")
+
+    ###------------------------------------------------------------------------------------------###
+    ###---------------------------------- Searching functions -----------------------------------###
+    ###------------------------------------------------------------------------------------------###
+
     # If you want to get all the indexes
     #sf.get_all_indexes()
 
@@ -57,8 +69,8 @@ def main():
     #pprint.pprint(sf.match_all())
 
     # If you want to get all the protocols
-    protocols = sf.get_protocols()
-    pprint.pprint(protocols)
+    #protocols = sf.get_protocols()
+    #pprint.pprint(protocols)
 
     # If you want to get all the flows for a given protocol
     #protocol = "tcp_ip"
@@ -86,9 +98,9 @@ def main():
     #pprint.pprint(applications)
 
     # If you want to get the list of flows for a given application
-    #application = "Unknown_UDP"
-    #flows_by_application = sf.get_flows_for_application(application)
-    #pprint.pprint(flows_by_application)
+    application = "Unknown_UDP"
+    flows_by_application = sf.get_flows_for_application(application)
+    pprint.pprint(flows_by_application)
 
     # If you want to get the number of flows for each application
     #nb_flows_per_application = sf.get_nb_flows_for_each_application()
@@ -114,11 +126,12 @@ def main():
     #nb_flows_for_each_tcp_flags = sf.get_nb_flows_for_each_tcp_flags()
     #pprint.pprint(nb_flows_for_each_tcp_flags)
 
+    ###------------------------------------------------------------------------------------------###
+    ###---------------------------------- Drawer functions --------------------------------------###
+    ###------------------------------------------------------------------------------------------###
+
     # Draw the Zipf's law for the number of packets
     #drawer.draw_zipf_for_each_nb_packets()
-
-    # Init the converter
-    cv = Converter(bulk_indexer.es, sf, "flows")
 
 if __name__ == "__main__":
     main()

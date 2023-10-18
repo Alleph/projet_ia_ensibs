@@ -31,6 +31,7 @@ class Drawer:
         plt.figure(1)
         plt.plot(X_source, Y_source)
         plt.plot(X_destination, Y_destination)
+        plt.grid()
         plt.xscale('log')
         plt.yscale('log')
         plt.xlabel("Rank")
