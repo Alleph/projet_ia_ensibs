@@ -8,8 +8,10 @@ class Converter:
         self.index_name = index_name.lower()
 
     # Convert the application name to an integer
-    # Exemple: appName_to_int("Unknown_UDP") -> 83
+    # Exemple: appName_to_int("Unknown_UDP") -> 83 (-1 if None)
     def appName_to_int(self, application_name):
+        if application_name == None:
+            return -1
         applications = self.sf.get_applications()
         appNameList = [app['key'] for app in applications]
         appNameList.sort()
@@ -19,6 +21,8 @@ class Converter:
     # Exemple: payload_to_list("abbcccdddd") -> [1, 2, 3, 4]
     def payload_to_list(self, payload):
         payloadList = [0] * 64
+        if payload == None:
+            return payloadList
         for char in payload:
             # A-Z = 0-25
             if ord(char) >= 65 and ord(char) <= 90:
@@ -48,11 +52,15 @@ class Converter:
             return [0, 0, 1, 0]
         elif direction == "L2L":
             return [0, 0, 0, 1]
+        else
+            return [0, 0, 0, 0] # None
 
     # Convert sourceTCPFlagsDescription or destinationTCPFlagsDescription to an integer
     # Exemple: tcpFlags_to_int("F,S,R,P,A") -> 3 * 11 * 5 * 7 * 2 = 2310 (prime factor decomposition)
     def tcpFlags_to_int(self, tcpFlags):
         i = 1
+        if tcpFlags == None:
+            return -1
         if tcpFlags == "N/A":
             return 0
         tcpFlagsList = tcpFlags.split(",")
@@ -76,6 +84,8 @@ class Converter:
     # Convert source or destination ip address to a vector of 4 integers
     # Exemple: 192.168.2.111 -> [192, 168, 2, 111]
     def ip_to_vector(self, ip):
+        if ip == None:
+            return [0, 0, 0, 0]
         ipList = ip.split(".")
         return [int(i) for i in ipList]
 
@@ -94,10 +104,14 @@ class Converter:
             return [0, 0, 0, 0, 1, 0]
         elif protocol == "ipv6icmp":
             return [0, 0, 0, 0, 0, 1]
+        else:
+            return [0, 0, 0, 0, 0, 0] # None
 
     # Convert startDateTime or stopDateTime to a timestamp
     # Exemple: dateTime_to_timestamp("2010-06-14T00:01:24") -> 1276473684
     def dateTime_to_timestamp(self, dateTime):
+        if dateTime == None:
+            return -1
         return int(datetime.strptime(dateTime, "%Y-%m-%dT%H:%M:%S").timestamp())
 
     # Convert Tag into a one hot vector
@@ -107,4 +121,6 @@ class Converter:
             return [1, 0]
         elif tag == "Attack":
             return [0, 1]
+        else:
+            return [0, 0] # None
     
