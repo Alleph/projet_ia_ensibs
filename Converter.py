@@ -1,4 +1,5 @@
 from SearchingFunctions import SearchingFunctions
+from datetime import datetime
 
 class Converter:
     def __init__(self, es, sf, index_name):
@@ -97,7 +98,7 @@ class Converter:
     # Convert startDateTime or stopDateTime to a timestamp
     # Exemple: dateTime_to_timestamp("2010-06-14T00:01:24") -> 1276473684
     def dateTime_to_timestamp(self, dateTime):
-        return int(datetime.datetime.strptime(dateTime, "%Y-%m-%dT%H:%M:%S").timestamp())
+        return int(datetime.strptime(dateTime, "%Y-%m-%dT%H:%M:%S").timestamp())
 
     # Convert Tag into a one hot vector
     # Exemple: Normal -> [1, 0] and Attack -> [0, 1]
