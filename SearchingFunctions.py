@@ -275,7 +275,6 @@ class SearchingFunctions:
 
     # get the list of all the distinct applications contained in the XML files
     def get_applications(self):
-        print("Get applications")
         body = {
             "size": 0,
             "aggs": {
@@ -297,6 +296,7 @@ class SearchingFunctions:
     def get_flows_for_application(self, application):
         print(f"Get flows for application {application}")
         body = {
+            "size": 500,
             "query": {
                 "match": {
                     "appName.keyword": application
