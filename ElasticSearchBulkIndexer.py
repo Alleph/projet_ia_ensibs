@@ -81,4 +81,6 @@ class ElasticSearchBulkIndexer:
         except Exception as e:
             print(f"An error occurred: {e}")
         
+    def update_max_result_windows(self, index_name, max_result_windows):
+        self.es.indices.put_settings(index=index_name, body={"index.max_result_window": max_result_windows})
             

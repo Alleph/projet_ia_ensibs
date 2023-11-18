@@ -12,7 +12,7 @@ class Converter:
     def appName_to_int(self, application_name):
         if application_name == None:
             return -1
-        applications = self.sf.get_applications()
+        applications = self.sf.get_nb_flows_for_each_application()
         appNameList = [app['key'] for app in applications]
         appNameList.sort()
         return appNameList.index(application_name)
@@ -52,7 +52,7 @@ class Converter:
             return [0, 0, 1, 0]
         elif direction == "L2L":
             return [0, 0, 0, 1]
-        else
+        else:
             return [0, 0, 0, 0] # None
 
     # Convert sourceTCPFlagsDescription or destinationTCPFlagsDescription to an integer
