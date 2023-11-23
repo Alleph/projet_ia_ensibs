@@ -85,3 +85,28 @@ def read_subsets_from_files(files):
 
     print("Get content from ", len(files), "files.")
     return contents
+
+
+# Prepare classification for a given protocol.
+def class_prep(app_name, sf, cv, files, debug):
+
+    # get list of flows for the given app
+    flows = sf.get_flows_for_application(app_name)
+    print(len(flows), "flows get for the ", app_name, "protocol.")
+
+    # split flow between normal and attack :
+    normal_flows, attack_flows = get_normal_and_attack_flows(flows)
+
+    # convert to vector :
+    normal_vector = flows_to_vector(normal_flows, cv)
+    attack_vector = flows_to_vector(attack_flows, cv)
+
+    # split in 5 subsets and store in files :
+    write_subsets_on_files(normal_vector, attack_vector, cv, files)
+
+    if debug:
+        # get the 5 subsets to verify
+        subsets = read_subsets_from_files(files)
+        for i in range(len(subsets)):
+            print("subset n°", i + 1, ":", len(subsets[i]), "vectors.")
+            print("first vector of this subset is : ", subsets[i][0])

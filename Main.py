@@ -99,9 +99,9 @@ def main():
     # pprint.pprint(applications)
 
     # If you want to get the list of flows for a given application
-    application = "HTTPWeb"
-    HTTPWeb_flows = sf.get_flows_for_application(application)
-    print("len(HTTPWeb) = ", len(HTTPWeb_flows))
+    # application = "HTTPWeb"
+    # HTTPWeb_flows = sf.get_flows_for_application(application)
+    # print("len(HTTPWeb) = ", len(HTTPWeb_flows))
     # pprint.pprint(HTTPWeb_flows)
 
     # If you want to get the number of flows for each application
@@ -139,24 +139,13 @@ def main():
     ###----------------------- Classification preparation --------------------------###
     ###------------------------------------------------------------------------------------------###
     print("--- Classification preparation ---")
-    # split flow between normal and attack :
-    HTTPWeb_flows_normal, HTTPWeb_flows_attack = get_normal_and_attack_flows(HTTPWeb_flows)
 
-    # convert to vector :
-    normal_vector = flows_to_vector(HTTPWeb_flows_normal, cv)
-    attack_vector = flows_to_vector(HTTPWeb_flows_attack, cv)
-
-    # split in 5 subsets and store in files :
     files = ['binarized_flows/binarized_flows_test_1', 'binarized_flows/binarized_flows_test_2',
              'binarized_flows/binarized_flows_test_3', 'binarized_flows/binarized_flows_test_4',
              'binarized_flows/binarized_flows_test_5']
-    write_subsets_on_files(normal_vector, attack_vector, cv, files)
 
-    # get the 5 subsets to verify
-    subsets = read_subsets_from_files(files)
-    for i in range(len(subsets)):
-        print("subset n°", i+1, ":", len(subsets[i]), "vectors.")
-        print("first vector of this subset is : ", subsets[i][0])
+    # Prepare classification for the HTTPWeb protocol.
+    class_prep("HTTPWeb", sf, cv, files, True)
 
 
 if __name__ == "__main__":
