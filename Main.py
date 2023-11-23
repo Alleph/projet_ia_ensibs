@@ -145,7 +145,7 @@ def main():
              'binarized_flows/binarized_flows_test_5']
 
     # Prepare classification for the HTTPWeb protocol.
-    class_prep("HTTPWeb", sf, cv, files, True)
+    class_prep("FTP", sf, 1000, cv, files, True)
 
 
 if __name__ == "__main__":

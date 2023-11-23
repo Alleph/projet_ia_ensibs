@@ -293,10 +293,10 @@ class SearchingFunctions:
         return res
 
     # get the list of flows for a given application
-    def get_flows_for_application(self, application):
+    def get_flows_for_application(self, application, size):
         print(f"Get flows for application {application}")
         body = {
-            "size": 500,
+            "size": size,
             "query": {
                 "match": {
                     "appName.keyword": application
