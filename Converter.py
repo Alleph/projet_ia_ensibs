@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from SearchingFunctions import SearchingFunctions
 from datetime import datetime
 
@@ -20,18 +22,20 @@ class Converter:
     # Convert sourcePayloadAsBase64 or destinationPayloadAsBase64 to a list of occurence of each character
     # Exemple: payload_to_list("abbcccdddd") -> [1, 2, 3, 4]
     def payload_to_list(self, payload):
+        if payload is None:
+            return [0] * 64
         payloadList = [0] * 64
         if payload == None:
             return payloadList
         for char in payload:
             # A-Z = 0-25
-            if ord(char) >= 65 and ord(char) <= 90:
+            if 65 <= ord(char) <= 90:
                 payloadList[ord(char) % 65] += 1
             # a-z = 26-51
-            elif ord(char) >= 97 and ord(char) <= 122:
+            elif 97 <= ord(char) <= 122:
                 payloadList[ord(char) % 97 + 26] += 1
             # 0-9 = 52-61
-            elif ord(char) >= 48 and ord(char) <= 57:
+            elif 48 <= ord(char) <= 57:
                 payloadList[ord(char) % 48 + 52] += 1
             # + = 62
             elif ord(char) == 43:
@@ -58,6 +62,8 @@ class Converter:
     # Convert sourceTCPFlagsDescription or destinationTCPFlagsDescription to an integer
     # Exemple: tcpFlags_to_int("F,S,R,P,A") -> 3 * 11 * 5 * 7 * 2 = 2310 (prime factor decomposition)
     def tcpFlags_to_int(self, tcpFlags):
+        if tcpFlags is None:
+            return -1
         i = 1
         if tcpFlags == None:
             return -1
@@ -117,6 +123,8 @@ class Converter:
     # Convert Tag into a one hot vector
     # Exemple: Normal -> [1, 0] and Attack -> [0, 1]
     def tag_to_one_hot(self, tag):
+        if tag is None:
+            return [0, 0]
         if tag == "Normal":
             return [1, 0]
         elif tag == "Attack":

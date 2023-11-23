@@ -1,11 +1,12 @@
 from ElasticSearchBulkIndexer import ElasticSearchBulkIndexer as ebi
+from classification_preparer import *
 from XMLParser import XMLParser
 from Converter import Converter
 from SearchingFunctions import SearchingFunctions
 from Drawer import Drawer
+import os
 from Classifier import Classifier
 import pprint
-import os
 import glob
 import time
 
@@ -14,26 +15,26 @@ PROTOCOL = "https"
 HOST = "localhost"
 PORT = 9200
 ELASTIC_USERNAME = "elastic"
-ELASTIC_PASSWORD = "uQksh15EsPWSzw1vq7s1"
+ELASTIC_PASSWORD = "trouvemoica"
 CRT_PATH = "certs/http_ca.crt"
 
 # List of xml files to index
 XML_DIR = "TRAIN_ENSIBS"
 XML_FILES = glob.glob(os.path.join(XML_DIR, "*.xml"))
 
-def main():
 
+def main():
     ###------------------------------------------------------------------------------------------###
     ###----------- Start indexation and initialize researcher, drawer and converter -------------###
     ###------------------------------------------------------------------------------------------###
 
     # Create an ElasticsearchBulkIndexer object
     bulk_indexer = ebi(
-        PROTOCOL, 
-        HOST, 
-        PORT, 
-        CRT_PATH, 
-        ELASTIC_USERNAME, 
+        PROTOCOL,
+        HOST,
+        PORT,
+        CRT_PATH,
+        ELASTIC_USERNAME,
         ELASTIC_PASSWORD)
 
     # Delete all indexes at the beginning
@@ -44,20 +45,20 @@ def main():
     #     bulk_indexer.bulk_index_data(xml_file)
     
     # Index only one XML file
-    #xml_file = XML_FILES[0]
-    #bulk_indexer.bulk_index_data(xml_file)
+    # xml_file = XML_FILES[1]
+    # bulk_indexer.bulk_index_data(xml_file)
 
     # Update the max result window size
     bulk_indexer.update_max_result_windows("flows", 200000)
 
     # Wait few seconds for the indexing to be done
-    time.sleep(5)
+    # time.sleep(5)
 
     # Init searching functions
     sf = SearchingFunctions(bulk_indexer.es, "flows")
 
     # Init the drawer
-    drawer = Drawer(bulk_indexer.es, sf, "flows")
+    # drawer = Drawer(bulk_indexer.es, sf, "flows")
 
     # Init the converter
     cv = Converter(bulk_indexer.es, sf, "flows")
@@ -86,16 +87,16 @@ def main():
     #pprint.pprint(flows_by_protocol) # !!! NOT RECOMMENDED !!!
 
     # If you want to get the source and destination Payload size for each protocol
-    #payload_size_per_protocol = sf.get_payload_size_for_each_protocol()
-    #pprint.pprint(payload_size_per_protocol)
+    # payload_size_per_protocol = sf.get_payload_size_for_each_protocol()
+    # pprint.pprint(payload_size_per_protocol)
 
     # If you want to get the source and destination total bytes for each protocol
-    #total_bytes_per_protocol = sf.get_total_bytes_for_each_protocol()
-    #pprint.pprint(total_bytes_per_protocol)
+    # total_bytes_per_protocol = sf.get_total_bytes_for_each_protocol()
+    # pprint.pprint(total_bytes_per_protocol)
 
     # If you want to get the total source/destination packets for each protocol
-    #total_packets_per_protocol = sf.get_total_packets_for_each_protocol()
-    #pprint.pprint(total_packets_per_protocol)
+    # total_packets_per_protocol = sf.get_total_packets_for_each_protocol()
+    # pprint.pprint(total_packets_per_protocol)
 
     # If you want to get the number of flows for each application
     #nb_flows_per_application = sf.get_nb_flows_for_each_application()
@@ -107,31 +108,31 @@ def main():
     #pprint.pprint(flows_by_application) # !!! NOT RECOMMENDED !!!
 
     # It you want to get the source and destination Payload size for each application
-    #payload_size_per_application = sf.get_payload_size_for_each_application()
-    #pprint.pprint(payload_size_per_application)
+    # payload_size_per_application = sf.get_payload_size_for_each_application()
+    # pprint.pprint(payload_size_per_application)
 
     # If you want to get the source and destination total bytes for each application
-    #total_bytes_per_application = sf.get_total_bytes_for_each_application()
-    #pprint.pprint(total_bytes_per_application)
+    # total_bytes_per_application = sf.get_total_bytes_for_each_application()
+    # pprint.pprint(total_bytes_per_application)
 
     # If you want to get the total source/destination packets for each application
-    #total_packets_per_application = sf.get_total_packets_for_each_application()
-    #pprint.pprint(total_packets_per_application)
+    # total_packets_per_application = sf.get_total_packets_for_each_application()
+    # pprint.pprint(total_packets_per_application)
 
     # If you want to get the number of flows for each number of packets
-    #nb_flows_for_each_nb_packets = sf.get_nb_flows_for_each_nb_packets()
-    #pprint.pprint(nb_flows_for_each_nb_packets)
+    # nb_flows_for_each_nb_packets = sf.get_nb_flows_for_each_nb_packets()
+    # pprint.pprint(nb_flows_for_each_nb_packets)
 
     # If you want to get the number of flows for each tcp flags
-    #nb_flows_for_each_tcp_flags = sf.get_nb_flows_for_each_tcp_flags()
-    #pprint.pprint(nb_flows_for_each_tcp_flags)
+    # nb_flows_for_each_tcp_flags = sf.get_nb_flows_for_each_tcp_flags()
+    # pprint.pprint(nb_flows_for_each_tcp_flags)
 
     ###------------------------------------------------------------------------------------------###
     ###---------------------------------- Drawer functions --------------------------------------###
     ###------------------------------------------------------------------------------------------###
 
     # Draw the Zipf's law for the number of packets
-    #drawer.draw_zipf_for_each_nb_packets()
+    # drawer.draw_zipf_for_each_nb_packets()
 
     ###------------------------------------------------------------------------------------------###
     ###---------------------------------- Converter functions -----------------------------------###
@@ -186,14 +187,17 @@ def main():
     # print(tag + " --> " + str(tagOneHot))
 
     ###------------------------------------------------------------------------------------------###
-    ###---------------------------------- Classifier functions ----------------------------------###
+    ###----------------------- Classification preparation --------------------------###
     ###------------------------------------------------------------------------------------------###
+    print("--- Classification preparation ---")
 
-    # Partition flows of the same appName into 5 equal sized subsets
-    # Exemple : partition_flows_by_appName("Unknown_UDP") -> {S1=[flow1, flow2, flow3], S2=[flow4, flow5, flow6], S3=[flow7, flow8, flow9], S4=[flow10, flow11, flow12], S5=[flow13, flow14, flow15]}
-    #application = "HTTPWeb"
-    #partition = csf.partition_flows_by_appName(application)
-    #pprint.pprint(partition)
+    files = ['binarized_flows/binarized_flows_test_1', 'binarized_flows/binarized_flows_test_2',
+             'binarized_flows/binarized_flows_test_3', 'binarized_flows/binarized_flows_test_4',
+             'binarized_flows/binarized_flows_test_5']
+
+    # Prepare classification for the HTTPWeb protocol.
+    class_prep("FTP", sf, 1000, cv, files, True)
+
 
 if __name__ == "__main__":
     main()
