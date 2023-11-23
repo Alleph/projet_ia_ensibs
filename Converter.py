@@ -26,13 +26,13 @@ class Converter:
         payloadList = [0] * 64
         for char in payload:
             # A-Z = 0-25
-            if ord(char) >= 65 and ord(char) <= 90:
+            if 65 <= ord(char) <= 90:
                 payloadList[ord(char) % 65] += 1
             # a-z = 26-51
-            elif ord(char) >= 97 and ord(char) <= 122:
+            elif 97 <= ord(char) <= 122:
                 payloadList[ord(char) % 97 + 26] += 1
             # 0-9 = 52-61
-            elif ord(char) >= 48 and ord(char) <= 57:
+            elif 48 <= ord(char) <= 57:
                 payloadList[ord(char) % 48 + 52] += 1
             # + = 62
             elif ord(char) == 43:
@@ -124,4 +124,3 @@ class Converter:
             return [1, 0]
         elif tag == "Attack":
             return [0, 1]
-    

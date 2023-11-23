@@ -26,31 +26,28 @@ def flows_to_vector(list_flows, cv):
         if '_source' not in flow:
             raise Exception("'_source' key not found in flow")
         for field in flow['_source']:
-            value: any
             match field:
                 # treat fields that requires conversion first
                 case 'appName':
-                    value = cv.appName_to_int(flow['_source'][field])
+                    flow_vector.append(cv.appName_to_int(flow['_source'][field]))
                 case 'sourcePayloadAsBase64' | 'destinationPayloadAsBase64':
-                    value = cv.payload_to_list(flow['_source'][field])
+                    flow_vector = flow_vector + cv.payload_to_list(flow['_source'][field])
                 case 'direction':
-                    value = cv.direction_to_one_hot(flow['_source'][field])
+                    flow_vector = flow_vector + cv.direction_to_one_hot(flow['_source'][field])
                 case 'sourceTCPFlagsDescription' | 'destinationTCPFlagsDescription':
-                    value = cv.tcpFlags_to_int(flow['_source'][field])
+                    flow_vector.append(cv.tcpFlags_to_int(flow['_source'][field]))
                 case 'source' | 'destination':
-                    value = cv.ip_to_vector(flow['_source'][field])
+                    flow_vector = flow_vector + cv.ip_to_vector(flow['_source'][field])
                 case 'protocolName':
-                    value = cv.protocol_to_one_hot(flow['_source'][field])
+                    flow_vector = flow_vector + cv.protocol_to_one_hot(flow['_source'][field])
                 case 'startDateTime' | 'stopDateTime':
-                    value = cv.dateTime_to_timestamp(flow['_source'][field])
+                    flow_vector.append(cv.dateTime_to_timestamp(flow['_source'][field]))
                 case 'Tag':
-                    value = cv.tag_to_one_hot(flow['_source'][field])
+                    flow_vector = flow_vector + cv.tag_to_one_hot(flow['_source'][field])
                 # treat fields that can be put as is
-                case 'totalSourceBytes' | 'totalDestinationBytes' | 'totalDestinationPackets' | 'totalSourcePackets'\
-                     | 'sourcePort' | 'destinationPort':
-                    value = flow['_source'][field]
-            # add the value to the vector
-            flow_vector.append(value)
+                case 'totalSourceBytes' | 'totalDestinationBytes' | 'totalDestinationPackets' | 'totalSourcePackets' | 'sourcePort' | 'destinationPort':
+                    flow_vector.append(flow['_source'][field])
+
         big_vector.append(flow_vector)
     return big_vector
 
