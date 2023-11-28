@@ -1,4 +1,5 @@
 import pickle
+import pprint
 
 
 # Return the flows split in two lists, one for normal flows, and one for attack flows.
@@ -19,35 +20,49 @@ def get_normal_and_attack_flows(flows):
 def flows_to_vector(list_flows, cv):
     # initialize the vector of vectors
     big_vector = []
+    # associate to each field its default value (the boolean specifies if the value must be concatenated)
+    # (True = concatenate, False = append)
+    default = {"appName":[False, -1], "totalSourceBytes":[False, 0], "totalDestinationBytes":[False, 0],
+                          "totalDestinationPackets":[False, 0], "totalSourcePackets":[False, 0],
+                          "sourcePayloadAsBase64":[True, [0] * 64], "destinationPayloadAsBase64":[True, [0] * 64],
+                          "direction":[True, [0, 0, 0, 0]], "sourceTCPFlagsDescription":[False, -1],
+                          "destinationTCPFlagsDescription":[False, -1], "source":[True, [0, 0, 0, 0]],
+                          "protocolName":[True, [0, 0, 0, 0, 0, 0]], "sourcePort":[False, -1],
+                          "destination":[True, [0, 0, 0, 0]], "destinationPort":[False, -1],
+                          "startDateTime":[False, -1], "stopDateTime":[False, -1], "Tag":[True, [0, 0]]}
 
     for flow in list_flows:
-        flow_vector = []
-        # convert each field of flow
         if '_source' not in flow:
             raise Exception("'_source' key not found in flow")
-        for field in flow['_source']:
-            match field:
-                # treat fields that requires conversion first
-                case 'appName':
-                    flow_vector.append(cv.appName_to_int(flow['_source'][field]))
-                case 'sourcePayloadAsBase64' | 'destinationPayloadAsBase64':
-                    flow_vector = flow_vector + cv.payload_to_list(flow['_source'][field])
-                case 'direction':
-                    flow_vector = flow_vector + cv.direction_to_one_hot(flow['_source'][field])
-                case 'sourceTCPFlagsDescription' | 'destinationTCPFlagsDescription':
-                    flow_vector.append(cv.tcpFlags_to_int(flow['_source'][field]))
-                case 'source' | 'destination':
-                    flow_vector = flow_vector + cv.ip_to_vector(flow['_source'][field])
-                case 'protocolName':
-                    flow_vector = flow_vector + cv.protocol_to_one_hot(flow['_source'][field])
-                case 'startDateTime' | 'stopDateTime':
-                    flow_vector.append(cv.dateTime_to_timestamp(flow['_source'][field]))
-                case 'Tag':
-                    flow_vector = flow_vector + cv.tag_to_one_hot(flow['_source'][field])
-                # treat fields that can be put as is
-                case 'totalSourceBytes' | 'totalDestinationBytes' | 'totalDestinationPackets' | 'totalSourcePackets' | 'sourcePort' | 'destinationPort':
-                    flow_vector.append(flow['_source'][field])
-
+        flow_vector = []
+        for field in default:
+            concatenate = default.get(field)[0]
+            value = default.get(field)[1]
+            if field in flow['_source']:
+                match field:
+                    case 'appName':
+                        value = cv.appName_to_int(flow['_source'][field])
+                    case 'sourcePayloadAsBase64' | 'destinationPayloadAsBase64':
+                        value = cv.payload_to_list(flow['_source'][field])
+                    case 'direction':
+                        value = cv.direction_to_one_hot(flow['_source'][field])
+                    case 'sourceTCPFlagsDescription' | 'destinationTCPFlagsDescription':
+                        value = cv.tcpFlags_to_int(flow['_source'][field])
+                    case 'source' | 'destination':
+                        value = cv.ip_to_vector(flow['_source'][field])
+                    case 'protocolName':
+                        value = cv.protocol_to_one_hot(flow['_source'][field])
+                    case 'startDateTime' | 'stopDateTime':
+                        value = cv.dateTime_to_timestamp(flow['_source'][field])
+                    case 'Tag':
+                        value = cv.tag_to_one_hot(flow['_source'][field])
+                    # treat fields that can be put as is
+                    case 'totalSourceBytes' | 'totalDestinationBytes' | 'totalDestinationPackets' | 'totalSourcePackets' | 'sourcePort' | 'destinationPort':
+                        value = flow['_source'][field]
+            if concatenate:
+                flow_vector = flow_vector + value
+            else:
+                flow_vector.append(value)
         big_vector.append(flow_vector)
     return big_vector
 
@@ -78,7 +93,7 @@ def write_subsets_on_files(normal_vector, attack_vector, cv, files):
 # Read content of each file and return it as list of objects.
 def read_subsets_from_files(files):
     contents = []
-    for i in range(5):
+    for i in range(len(files)):
         f = open(files[i], 'rb')
         contents.append(pickle.load(f))
         f.close()
