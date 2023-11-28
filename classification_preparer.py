@@ -10,7 +10,7 @@ def get_normal_and_attack_flows(flows):
     for flow in flows:
         if '_source' in flow and flow['_source'].get('Tag') == 'Normal':
             normal_flows.append(flow)
-        else:
+        elif '_source' in flow and flow['_source'].get('Tag') == 'Attack':
             attack_flows.append(flow)
     print("Successfull split between normal and attack flows.")
     return normal_flows, attack_flows
@@ -29,7 +29,7 @@ def flows_to_vector(list_flows, cv):
                           "destinationTCPFlagsDescription":[False, -1], "source":[True, [0, 0, 0, 0]],
                           "protocolName":[True, [0, 0, 0, 0, 0, 0]], "sourcePort":[False, -1],
                           "destination":[True, [0, 0, 0, 0]], "destinationPort":[False, -1],
-                          "startDateTime":[False, -1], "stopDateTime":[False, -1], "Tag":[True, [0, 0]]}
+                          "startDateTime":[False, -1], "stopDateTime":[False, -1], "Tag":[False, -1]}
 
     for flow in list_flows:
         if '_source' not in flow:
@@ -56,9 +56,11 @@ def flows_to_vector(list_flows, cv):
                         value = cv.dateTime_to_timestamp(flow['_source'][field])
                     case 'Tag':
                         value = cv.tag_to_one_hot(flow['_source'][field])
-                    # treat fields that can be put as is
+                    # fields that can be put as is
                     case 'totalSourceBytes' | 'totalDestinationBytes' | 'totalDestinationPackets' | 'totalSourcePackets' | 'sourcePort' | 'destinationPort':
                         value = flow['_source'][field]
+                        if value is None:
+                            value = 0
             if concatenate:
                 flow_vector = flow_vector + value
             else:
@@ -98,7 +100,7 @@ def read_subsets_from_files(files):
         contents.append(pickle.load(f))
         f.close()
 
-    print("Get content from ", len(files), "files.")
+    print("Get content from ", len(files), "file(s).")
     return contents
 
 
