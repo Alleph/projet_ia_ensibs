@@ -88,10 +88,10 @@ def read_subsets_from_files(files):
 
 
 # Prepare classification for a given protocol.
-def class_prep(app_name, sf, size, cv, files, debug):
+def class_prep(app_name, sf, cv, files, debug):
 
     # get list of flows for the given app
-    flows = sf.get_flows_for_application(app_name, size)
+    flows = sf.get_flows_for_application(app_name)
     print(len(flows), "flows retrieved for", app_name)
 
     # split flow between normal and attack :
@@ -109,4 +109,4 @@ def class_prep(app_name, sf, size, cv, files, debug):
         subsets = read_subsets_from_files(files)
         for i in range(len(subsets)):
             print("subset n°", i + 1, ":", len(subsets[i]), "vectors.")
-            print("first vector of this subset is : ", subsets[i][0])
+            print(f"First vector of this subset is : ", subsets[i][0])

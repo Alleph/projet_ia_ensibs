@@ -4,8 +4,9 @@ from XMLParser import XMLParser
 from Converter import Converter
 from SearchingFunctions import SearchingFunctions
 from Drawer import Drawer
-import os
 from Classifier import Classifier
+from KNNClassifier import KNNClassifier
+import os
 import pprint
 import glob
 import time
@@ -15,7 +16,7 @@ PROTOCOL = "https"
 HOST = "localhost"
 PORT = 9200
 ELASTIC_USERNAME = "elastic"
-ELASTIC_PASSWORD = "trouvemoica"
+ELASTIC_PASSWORD = "uQksh15EsPWSzw1vq7s1"
 CRT_PATH = "certs/http_ca.crt"
 
 # List of xml files to index
@@ -38,15 +39,15 @@ def main():
         ELASTIC_PASSWORD)
 
     # Delete all indexes at the beginning
-    # bulk_indexer.delete_all_indexes()
+    #bulk_indexer.delete_all_indexes()
 
     # Index all the XML files
     # for xml_file in XML_FILES:
     #     bulk_indexer.bulk_index_data(xml_file)
     
     # Index only one XML file
-    # xml_file = XML_FILES[1]
-    # bulk_indexer.bulk_index_data(xml_file)
+    #xml_file = XML_FILES[-1]
+    #bulk_indexer.bulk_index_data(xml_file)
 
     # Update the max result window size
     bulk_indexer.update_max_result_windows("flows", 200000)
@@ -62,9 +63,6 @@ def main():
 
     # Init the converter
     cv = Converter(bulk_indexer.es, sf, "flows")
-
-    # Init the classifier
-    csf = Classifier(bulk_indexer.es, sf, cv, "flows")
 
     ###------------------------------------------------------------------------------------------###
     ###---------------------------------- Searching functions -----------------------------------###
@@ -144,7 +142,8 @@ def main():
     # appNameInt = cv.appName_to_int(appName)
     # print(appName + " --> " + str(appNameInt))
 
-    # Convert sourcePayloadAsBase64 or destinationPayloadAsBase64 to a list of occurence of each character
+    # Convert sourcePayloadAsBase64 or destinationPayloadAsBase64 to a list of occurence 
+    # of each character
     # Exemple: payload_to_list("abbcccdddd") -> [1, 2, 3, 4]
     # payload = "VVNFUiB1c2VyMTINClBBU1MgbnNsdXNlcjEyDQpTVEFUDQpRVUlUDQo="
     # payloadList = cv.payload_to_list(payload)
@@ -187,7 +186,7 @@ def main():
     # print(tag + " --> " + str(tagOneHot))
 
     ###------------------------------------------------------------------------------------------###
-    ###----------------------- Classification preparation --------------------------###
+    ###-------------------------------- Classification preparation ------------------------------###
     ###------------------------------------------------------------------------------------------###
     print("--- Classification preparation ---")
 
@@ -196,7 +195,21 @@ def main():
              'binarized_flows/binarized_flows_test_5']
 
     # Prepare classification for the HTTPWeb protocol.
-    class_prep("FTP", sf, 1000, cv, files, True)
+    class_prep("FTP", sf, cv, files, True)
+
+    ###------------------------------------------------------------------------------------------###
+    ###-------------------------------------- Classification ------------------------------------###
+    ###------------------------------------------------------------------------------------------###
+
+    # Get subsets from files
+    subsets = read_subsets_from_files(files)
+    print("Subsets loaded from files.")
+
+    # Init the KNN classifier
+    knn = KNNClassifier(subsets)
+
+    # Classify with KNN classifier
+    knn.classifyKNN(1)
 
 
 if __name__ == "__main__":

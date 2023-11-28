@@ -160,7 +160,6 @@ class SearchingFunctions:
 
     # get the list of all the distinct protocols contained in XML files
     def get_nb_flows_for_each_protocol(self):
-        print("Get protocols")
         body = {
             "size": 0,
             "aggs": {
@@ -209,7 +208,6 @@ class SearchingFunctions:
 
     # get the number of flows for each application
     def get_nb_flows_for_each_application(self):
-        print("Get number of flows for each application")
         body = {
             "size": 0,
             "aggs": {
