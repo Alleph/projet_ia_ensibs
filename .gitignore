@@ -1,2 +1,8 @@
 TRAIN_ENSIBS/
+TEST_ENSIBS/
 __pycache__/
+defi1/
+defi2/
+binarized_flows/
+img/
+tree.txt

@@ -5,7 +5,6 @@ from Converter import Converter
 from SearchingFunctions import SearchingFunctions
 from Drawer import Drawer
 from Classifier import Classifier
-from KNNClassifier import KNNClassifier
 import os
 import pprint
 import glob
@@ -22,7 +21,10 @@ CRT_PATH = "certs/http_ca.crt"
 # List of xml files to index
 XML_DIR = "TRAIN_ENSIBS"
 XML_FILES = glob.glob(os.path.join(XML_DIR, "*.xml"))
-
+XML_TEST_HTTPWeb = "TEST_ENSIBS/benchmark_HTTPWeb_test.xml"
+XML_TEST_SSH = "TEST_ENSIBS/benchmark_SSH_test.xml"
+XML_TEST_DEFI2 = "defi2/traffic_os_TEST.xml"
+XML_TRAIN_DEFI2 = "defi2/traffic_os_TRAIN.xml"
 
 def main():
     ###------------------------------------------------------------------------------------------###
@@ -42,8 +44,8 @@ def main():
     #bulk_indexer.delete_all_indexes()
 
     # Index all the XML files
-    # for xml_file in XML_FILES:
-    #     bulk_indexer.bulk_index_data(xml_file)
+    #for xml_file in XML_FILES:
+    #    bulk_indexer.bulk_index_data(xml_file)
     
     # Index only one XML file
     #xml_file = XML_FILES[-1]
@@ -53,7 +55,7 @@ def main():
     bulk_indexer.update_max_result_windows("flows", 200000)
 
     # Wait few seconds for the indexing to be done
-    # time.sleep(5)
+    time.sleep(5)
 
     # Init searching functions
     sf = SearchingFunctions(bulk_indexer.es, "flows")
@@ -180,9 +182,9 @@ def main():
     # print(dateTime + " --> " + str(timestamp))
 
     # Convert Tag into a one hot vector
-    # Exemple: tag_to_one_hot("Normal") -> [1, 0] and tag_to_one_hot("Attack") -> [0, 1]
+    # Exemple: tag_to_int("Normal") -> 1 and tag_to_int("Attack") -> 2 
     # tag = "Normal"
-    # tagOneHot = cv.tag_to_one_hot(tag)
+    # tagOneHot = cv.tag_to_int(tag)
     # print(tag + " --> " + str(tagOneHot))
 
     ###------------------------------------------------------------------------------------------###
@@ -190,26 +192,110 @@ def main():
     ###------------------------------------------------------------------------------------------###
     print("--- Classification preparation ---")
 
-    files = ['binarized_flows/binarized_flows_test_1', 'binarized_flows/binarized_flows_test_2',
-             'binarized_flows/binarized_flows_test_3', 'binarized_flows/binarized_flows_test_4',
-             'binarized_flows/binarized_flows_test_5']
+    files = ['binarized_flows/binarized_flows_test_1.pickle', 'binarized_flows/binarized_flows_test_2.pickle',
+              'binarized_flows/binarized_flows_test_3.pickle', 'binarized_flows/binarized_flows_test_4.pickle',
+              'binarized_flows/binarized_flows_test_5.pickle']
+
+    appName = "SSH"
+
+    #files = f"defi1/binarized_train_flows/{appName}_binarized_train_flows.pickle"
 
     # Prepare classification for the HTTPWeb protocol.
-    class_prep("FTP", sf, cv, files, True)
+    # Please comment out this line after binarization (for the first time only).
+    class_prep(appName, sf, cv, files, True)
 
     ###------------------------------------------------------------------------------------------###
     ###-------------------------------------- Classification ------------------------------------###
     ###------------------------------------------------------------------------------------------###
 
-    # Get subsets from files
-    subsets = read_subsets_from_files(files)
-    print("Subsets loaded from files.")
+    print("--- Classification ---")
+    
+    classifier_type = "KNN" # "KNN" or "MNB" for KNN classifier or Multinomial Naive Bayes classifier
 
-    # Init the KNN classifier
-    knn = KNNClassifier(subsets)
+    if isinstance(files, list):
+        # Get subsets from files
+        subsets = read_subsets_from_files(files)
+        print("Subsets loaded from files.")
 
-    # Classify with KNN classifier
-    knn.classifyKNN(1)
+        # Show first vector of the subsets
+        show_first_vector_of_each_subset(subsets)
+
+        # Init the KNN classifier
+        csf = Classifier(subsets)
+
+        if classifier_type == "KNN":
+            # Predict attack flows with KNN classifier
+            csf.classifyKNN(k=6)
+        elif classifier_type == "MNB":
+            # Predict attack flows with Multinomial Naive Bayes classifier
+            csf.classifyMNB()
+
+    else:
+        # Get vectors from files
+        training_vectors = read_subsets_from_files(files)
+        print("- Training vectors for defi 1 loaded from file.")
+
+        # Init the classifier
+        csf = Classifier(training_vectors)
+
+    ###------------------------------------------------------------------------------------------###
+    ###---------------------------------------- Testing defi 1 ----------------------------------###
+    ###------------------------------------------------------------------------------------------###
+
+    # Prepare testing flows for the HTTPWeb protocol.
+    
+    # xml_parser = XMLParser(XML_TEST_HTTPWeb)
+    # xml_parser.load_xml2()
+    # testing_flows = xml_parser.get_flows()
+
+    # print("Testing flows for defi 1 loaded from file.")
+    # print("Number of testing flows : ", len(testing_flows))
+
+    # # Convert flows to vectors
+    # testing_vectors = flows_to_vector(testing_flows, cv)
+    # print("Testing vector loaded from file.")
+    # print("Number of testing vectors : ", len(testing_vectors))
+
+    # # Write testing vector on file
+    # write_test_vectors_on_file(testing_vectors, cv, f"defi1/binarized_test_flows/{appName}_binarized_test_flows.pickle")
+
+    # # Load testing vector from file
+    # testing_vectors = read_subsets_from_files(f"defi1/binarized_test_flows/{appName}_binarized_test_flows.pickle")
+    # print("- Testing vectors loaded from file.")
+
+    # classifier_type = "KNN" # "KNN" or "MNB" for KNN classifier or Multinomial Naive Bayes classifier
+
+    # # Predict attack flows with KNN classifier
+    # proba = csf.predict_attack(training_vectors, testing_vectors, classifier_type, k=6)
+
+    # # Make json file of results
+    # csf.make_json_res(proba, classifier_type, appName)
+
+
+    ###------------------------------------------------------------------------------------------###
+    ###------------------------------------------ Defi 2 ----------------------------------------###
+    ###------------------------------------------------------------------------------------------###
+    # print("------------ Defi 2 ------------")
+
+    # # Prepare training flows.
+    # xml_parser = XMLParser(XML_TRAIN_DEFI2)
+    # xml_parser.load_xml()
+    # training_flows = xml_parser.get_flows()
+
+    # print("Training flows for defi 2 loaded from file.")
+    # print("Number of training flows : ", len(training_flows))
+
+    # # Prepare testing flows.
+    # xml_parser = XMLParser(XML_TEST_DEFI2)
+    # xml_parser.load_xml()
+    # testing_flows = xml_parser.get_flows()
+
+    # print("Testing flows for defi 2 loaded from file.")
+    # print("Number of testing flows : ", len(testing_flows))
+
+    # # Convert flows to vectors
+    # print("First flow of testing vectors : ", testing_flows[:3])
+    # print("First flow of training vectors : ", training_flows[:3])
 
 
 if __name__ == "__main__":

@@ -10,14 +10,14 @@ class Converter:
         self.index_name = index_name.lower()
 
     # Convert the application name to an integer
-    # Exemple: appName_to_int("Unknown_UDP") -> 83 (-1 if None)
+    # Exemple: appName_to_int("Unknown_UDP") -> 83 (0 if None)
     def appName_to_int(self, application_name):
         if application_name == None:
-            return -1
+            return 0
         applications = self.sf.get_nb_flows_for_each_application()
-        appNameList = [app['key'] for app in applications]
+        appNameList = [app['key'] for app in applications] 
         appNameList.sort()
-        return appNameList.index(application_name)
+        return appNameList.index(application_name) + 1 # +1 because 0 is reserved for None
 
     # Convert sourcePayloadAsBase64 or destinationPayloadAsBase64 to a list of occurence of each character
     # Exemple: payload_to_list("abbcccdddd") -> [1, 2, 3, 4]
@@ -63,10 +63,10 @@ class Converter:
     # Exemple: tcpFlags_to_int("F,S,R,P,A") -> 3 * 11 * 5 * 7 * 2 = 2310 (prime factor decomposition)
     def tcpFlags_to_int(self, tcpFlags):
         if tcpFlags is None:
-            return -1
+            return 0
         i = 1
         if tcpFlags == None:
-            return -1
+            return 0
         if tcpFlags == "N/A":
             return 0
         tcpFlagsList = tcpFlags.split(",")
@@ -117,18 +117,20 @@ class Converter:
     # Exemple: dateTime_to_timestamp("2010-06-14T00:01:24") -> 1276473684
     def dateTime_to_timestamp(self, dateTime):
         if dateTime == None:
-            return -1
+            return 0
         return int(datetime.strptime(dateTime, "%Y-%m-%dT%H:%M:%S").timestamp())
 
     # Convert Tag into a one hot vector
-    # Exemple: Normal -> [1, 0] and Attack -> [0, 1]
-    def tag_to_one_hot(self, tag):
+    # Exemple: Normal -> 1 and Attack -> 2 and None -> 0
+    def tag_to_int(self, tag):
         if tag is None:
-            return [0, 0]
+            return 0
         if tag == "Normal":
-            return [1, 0]
+            return 1
         elif tag == "Attack":
-            return [0, 1]
+            return 2
+        elif tag == "Victim":
+            return 3
         else:
-            return [0, 0] # None
+            return 0 # None
     
