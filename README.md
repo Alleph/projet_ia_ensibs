@@ -19,7 +19,7 @@ This sub-project allows you to :
 
 ## Requirements
 
-Please run the following command in your command line to load the required Python libraries (Make sure to be in the right directory `/src`) :
+Please run the following command in your command line to load the required Python libraries (Make sure to be in the right directory `/projet_ia_ensibs`) :
 
 ```powershell
 pip install -r requirements.txt
@@ -39,7 +39,7 @@ CRT_PATH = "certs/http_ca.crt"
 
 ### Certificate
 
-Make sure to put your certificate in the `/src/cert` folder and name it as is the `CRT_PATH` above.
+Make sure to put your certificate in the `/cert` folder and name it as is the `CRT_PATH` above.
 
 ### Server password
 
@@ -68,7 +68,7 @@ python Main.py -index
 You should see a message indicating that the connection has been successfully established and the indexation starting :
 
 ```powershell
-C:\[...]\src> py .\Main.py -index
+C:\[...]\projet_ia_ensibs> py .\Main.py -index
 Connection to ElasticSearch server successful !
 Index flows deleted successfully.
 Indexes deleted successfully (except system indices).
@@ -86,7 +86,7 @@ python Main.py -delete
 ```
 You will have to re-index the data if you want to access it again :
 ```powershell
-C:\[...]\src> py .\Main.py -delete
+C:\[...]\projet_ia_ensibs> py .\Main.py -delete
 Connection to ElasticSearch server successful !
 Index flows deleted successfully.
 Indexes deleted successfully (except system indices).
@@ -114,7 +114,7 @@ This classification preparation will do these things :
 4. These files will be saved in the `/binarized_flows` folder.
 
 ```powershell
-C:\[...]\src> py .\Main.py project SSH KNN -vect
+C:\[...]\projet_ia_ensibs> py .\Main.py project SSH KNN -vect
 Connection to ElasticSearch server successful !
 ---------- Classification preparation ----------
 Get flows for application SSH
@@ -273,7 +273,7 @@ In order to access data, uncomment the searching function of your choice among t
 Here is an example of what we get using the `get_flows_for_application()` function with `Unknown_UDP` as argument :
 
 ```json
-C:\[...]\src> py .\Main.py
+C:\[...]\projet_ia_ensibs> py .\Main.py
 Connection to ElasticSearch server successful !
 Get flows for application Unknown_UDP
 [{'_id': 'MFJSRIsBBh9r-bbjmbjT',
