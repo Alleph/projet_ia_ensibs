@@ -202,7 +202,7 @@ def main():
 
     # Prepare classification for the HTTPWeb protocol.
     # Please comment out this line after binarization (for the first time only).
-    class_prep(appName, sf, cv, files, True)
+    #class_prep(appName, sf, cv, files, True)
 
     ###------------------------------------------------------------------------------------------###
     ###-------------------------------------- Classification ------------------------------------###
@@ -210,7 +210,7 @@ def main():
 
     print("--- Classification ---")
     
-    classifier_type = "KNN" # "KNN" or "MNB" for KNN classifier or Multinomial Naive Bayes classifier
+    classifier_type = "MNB" # "KNN" or "MNB" for KNN classifier or Multinomial Naive Bayes classifier
 
     if isinstance(files, list):
         # Get subsets from files

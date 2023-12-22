@@ -2,10 +2,12 @@ import time
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.metrics import f1_score, precision_score, recall_score, roc_curve, auc
 import numpy as np
 import sys
 import json
+import matplotlib.pyplot as plt
+import scikitplot as skplt
 #np.set_printoptions(threshold=sys.maxsize)
 
 
@@ -45,7 +47,7 @@ class Classifier:
         print(f"---------------- KNN classifier with k = {k} ----------------")
 
         # Init KNN classifier
-        clf_knn = KNeighborsClassifier(n_neighbors=k)         
+        clf_knn = KNeighborsClassifier(n_neighbors=k)      
 
         # Prepare data for training and testing
         total_time = 0
@@ -53,7 +55,7 @@ class Classifier:
             X_train, y_train, X_test, y_test = self.prep_data(task)
         
             # Train with KNN classifier
-            print("Training . . .")
+            print("------------------------- Training . . . -------------------------")
             print(f"X_train : {X_train}")
             print(f"y_train : {y_train}")
 
@@ -65,22 +67,24 @@ class Classifier:
             print(f"Train done in {time_diff} seconds \n")
 
             # Predict with KNN classifier
-            print("Predicting . . .")
+            print("------------------------- Predicting . . . -------------------------")
             print(f"X_test : {X_test}")
             print(f"y_test : {y_test}")
 
             start_time = time.time()
             y_pred = clf_knn.predict(X_test)
+            y_proba = clf_knn.predict_proba(X_test)
             end_time = time.time()
             time_diff = end_time - start_time
             total_task_time += time_diff
             print(f"Prediction : {y_pred}")
+            print(f"Probabilities : {y_proba}")
             print(f"Predict done in {time_diff} seconds \n")
 
             print(f"Task {task} ended in {total_task_time} seconds")
 
             # Evaluate the KNN classifier
-            print("Evaluating . . .")
+            print("------------------------- Evaluating . . . -------------------------")
             PREC_knn = precision_score(y_test, y_pred, average='macro')
             REC_knn = recall_score(y_test, y_pred, average='macro')
             F1_knn = f1_score(y_test, y_pred, average='macro')
@@ -88,6 +92,16 @@ class Classifier:
             print(f"Precision : {PREC_knn}")
             print(f"Recall : {REC_knn}")
             print(f"F1 score : {F1_knn} \n")
+
+            print("---------------------------- ROC curve -----------------------------")
+            fpr, tpr, thresholds = roc_curve(y_test, y_pred, pos_label=2)
+            roc_auc = auc(fpr, tpr)
+            print(f"fpr : {fpr}")
+            print(f"tpr : {tpr}")
+            print(f"thresholds : {thresholds}")
+
+            skplt.metrics.plot_roc_curve(y_test, y_proba)
+            plt.show()
 
             total_time += total_task_time
         
@@ -98,7 +112,7 @@ class Classifier:
         print("---------------- Multinomial Naive Bayes classifier ----------------")
 
         # Init Multinomial Naive Bayes classifier
-        clf_mnb = MultinomialNB()
+        clf_mnb = MultinomialNB(force_alpha=True)
 
         # Prepare data for training and testing
         total_time = 0
@@ -106,7 +120,7 @@ class Classifier:
             X_train, y_train, X_test, y_test = self.prep_data(task)
 
             # Train with Multinomial Naive Bayes classifier
-            print("Training . . .")
+            print("------------------------- Training . . . -------------------------")
             print(f"X_test : {X_test}")
             print(f"y_test : {y_test}")
             
@@ -118,22 +132,25 @@ class Classifier:
             print(f"Train done in {time_diff} seconds \n")
 
             # Predict with Multinomial Naive Bayes classifier
-            print("Predicting . . .")
+            print("------------------------- Predicting . . . -------------------------")
             print(f"X_test : {X_test}")
             print(f"y_test : {y_test}")
             
             start_time = time.time()
             y_pred = clf_mnb.predict(X_test)
+            y_proba = clf_mnb.predict_proba(X_test)
             end_time = time.time()
             time_diff = end_time - start_time
             total_task_time += time_diff
             print(f"Prediction : {y_pred}")
+            print(f"classes : {clf_mnb.classes_}")
+            print(f"Probabilities : {y_proba}")
             print(f"Predict done in {time_diff} seconds \n")
 
             print(f"Task {task} ended in {total_task_time} seconds")
 
             # Evaluate the Multinomial Naive Bayes classifier
-            print("Evaluating . . .")
+            print("------------------------- Evaluating . . . -------------------------")
             PREC_knn = precision_score(y_test, y_pred, average='macro')
             REC_knn = recall_score(y_test, y_pred, average='macro')
             F1_knn = f1_score(y_test, y_pred, average='macro')
@@ -141,6 +158,16 @@ class Classifier:
             print(f"Precision : {PREC_knn}")
             print(f"Recall : {REC_knn}")
             print(f"F1 score : {F1_knn} \n")
+
+            print("---------------------------- ROC curve -----------------------------")
+            fpr, tpr, thresholds = roc_curve(y_test, y_pred, pos_label=2)
+            roc_auc = auc(fpr, tpr)
+            print(f"fpr : {fpr}")
+            print(f"tpr : {tpr}")
+            print(f"thresholds : {thresholds}")
+
+            skplt.metrics.plot_roc(y_test, y_proba)
+            plt.show()
 
             total_time += total_task_time
 
@@ -202,6 +229,7 @@ class Classifier:
             print(f"Predict done in {time_diff} seconds \n")
             print(f"Order : {clf_knn.classes_}")
             print(f"Probabilities : {proba}")
+            
 
             return proba
         
