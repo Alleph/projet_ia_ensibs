@@ -1,0 +1,8 @@
+elasticsearch
+lxml
+matplotlib
+pprint
+numpy
+scikit-learn
+scikit-plot
+scipy
