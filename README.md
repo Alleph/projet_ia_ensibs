@@ -17,6 +17,33 @@ This sub-project allows you to :
 
 # Set up
 
+## Add XML files
+
+You must add the following XML files in the `/TRAIN_ENSIBS` folder :
+```
+TestbedMonJun14Flows.xml
+TestbedSatJun12Flows.xml
+TestbedSunJun13Flows.xml
+TestbedTueJun15-1Flows.xml
+TestbedTueJun15-2Flows.xml
+TestbedWedJun16-1Flows.xml
+TestbedWedJun16-2Flows.xml
+TestbedThuJun17-1bisFlows.xml
+TestbedThuJun17-2Flows.xml
+```
+
+The following XML files in the `defi1/` folder :
+```
+benchmark_HTTPWeb_test.xml
+benchmark_SSH_test.xml
+```
+
+The following XML files in the `defi2/` folder :
+```
+traffic_os_TEST.xml
+traffic_os_TRAIN.xml
+```
+
 ## Requirements
 
 Please run the following command in your command line to load the required Python libraries (Make sure to be in the right directory `/projet_ia_ensibs`) :
