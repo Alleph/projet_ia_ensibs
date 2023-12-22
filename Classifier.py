@@ -18,7 +18,7 @@ class Classifier:
         self.subsets = subsets
 
     def prep_data(self, task):
-        print(f"---------------- Task {task} ----------------")
+        print(f"---------------- Task {task} ----------------\n")
         # Task_i is when subset_i is used as test set and the others as training set
         X_train = []
         y_train = []
@@ -44,7 +44,7 @@ class Classifier:
 
     def classifyKNN(self, k):
         """Classify a vector using the k-NN classifier"""
-        print(f"---------------- KNN classifier with k = {k} ----------------")
+        print(f"\n---------------- KNN classifier with k = {k} ----------------\n")
 
         # Init KNN classifier
         clf_knn = KNeighborsClassifier(n_neighbors=k)      
@@ -55,9 +55,9 @@ class Classifier:
             X_train, y_train, X_test, y_test = self.prep_data(task)
         
             # Train with KNN classifier
-            print("------------------------- Training . . . -------------------------")
-            print(f"X_train : {X_train}")
-            print(f"y_train : {y_train}")
+            print("------------------------- Training . . . -------------------------\n")
+            print(f"X_train : {X_train}\n")
+            print(f"y_train : {y_train}\n")
 
             start_time = time.time()
             clf_knn.fit(X_train, y_train)
@@ -67,9 +67,9 @@ class Classifier:
             print(f"Train done in {time_diff} seconds \n")
 
             # Predict with KNN classifier
-            print("------------------------- Predicting . . . -------------------------")
-            print(f"X_test : {X_test}")
-            print(f"y_test : {y_test}")
+            print("------------------------- Predicting . . . -------------------------\n")
+            print(f"X_test : {X_test}\n")
+            print(f"y_test : {y_test}\n")
 
             start_time = time.time()
             y_pred = clf_knn.predict(X_test)
@@ -81,10 +81,10 @@ class Classifier:
             print(f"Probabilities : {y_proba}")
             print(f"Predict done in {time_diff} seconds \n")
 
-            print(f"Task {task} ended in {total_task_time} seconds")
+            print(f"Task {task} ended in {total_task_time} seconds\n")
 
             # Evaluate the KNN classifier
-            print("------------------------- Evaluating . . . -------------------------")
+            print("------------------------- Evaluating . . . -------------------------\n")
             PREC_knn = precision_score(y_test, y_pred, average='macro')
             REC_knn = recall_score(y_test, y_pred, average='macro')
             F1_knn = f1_score(y_test, y_pred, average='macro')
@@ -93,7 +93,7 @@ class Classifier:
             print(f"Recall : {REC_knn}")
             print(f"F1 score : {F1_knn} \n")
 
-            print("---------------------------- ROC curve -----------------------------")
+            print("---------------------------- ROC curve -----------------------------\n")
             fpr, tpr, thresholds = roc_curve(y_test, y_pred, pos_label=2)
             roc_auc = auc(fpr, tpr)
             print(f"fpr : {fpr}")
@@ -101,11 +101,12 @@ class Classifier:
             print(f"thresholds : {thresholds}")
 
             skplt.metrics.plot_roc_curve(y_test, y_proba)
+            plt.grid()
             plt.show()
 
             total_time += total_task_time
         
-        print(f"All tasks ended in {total_time} seconds")
+        print(f"All tasks ended in {total_time} seconds\n")
 
     def classifyMNB(self):
         """Classify a vector using Multinoial Naive Bayes classifier"""

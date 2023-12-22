@@ -152,10 +152,10 @@ def class_prep(app_name, sf, cv, files, debug):
     normal_vector = flows_to_vector(normal_flows, cv)
     attack_vector = flows_to_vector(attack_flows, cv)
 
-    print("Normal vector length :", len(normal_vector))
-    print("First normal vector :", normal_vector[:3])
-    print("Attack vector length :", len(attack_vector))
-    print("First attack vector :", attack_vector[:3])
+    # print("Normal vector length :", len(normal_vector))
+    # print("First normal vector :", normal_vector[:3])
+    # print("Attack vector length :", len(attack_vector))
+    # print("First attack vector :", attack_vector[:3])
 
     # split in 5 subsets and store in files :
     write_subsets_on_files(normal_vector, attack_vector, cv, files)

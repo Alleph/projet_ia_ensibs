@@ -249,6 +249,8 @@ def main():
 
     if sys.argv[1] == "project":
 
+        appName = sys.argv[2]
+
         files = ['binarized_flows/binarized_flows_test_1.pickle', 'binarized_flows/binarized_flows_test_2.pickle',
                 'binarized_flows/binarized_flows_test_3.pickle', 'binarized_flows/binarized_flows_test_4.pickle',
                 'binarized_flows/binarized_flows_test_5.pickle']
@@ -257,11 +259,12 @@ def main():
         print("---------- Classification preparation ----------")
         
         if len(sys.argv) > 4 and "-vect" in sys.argv:
-            class_prep(appName, sf, cv, files, True)
+            class_prep(appName, sf, cv, files, False)
 
-    appName = sys.argv[2]
 
     if sys.argv[1] == "defi1":
+
+        appName = sys.argv[2]
 
         files = f"defi1/binarized_train_flows/{appName}_binarized_train_flows.pickle"
 
@@ -269,7 +272,7 @@ def main():
         print("---------- Classification preparation ----------")
 
         if len(sys.argv) > 4 and "-vect" in sys.argv:
-            class_prep(appName, sf, cv, files, True)
+            class_prep(appName, sf, cv, files, False)
 
     ###------------------------------------------------------------------------------------------###
     ###-------------------------------------- Classification ------------------------------------###
@@ -293,6 +296,7 @@ def main():
 
         if classifier_type == "KNN":
             # Predict attack flows with KNN classifier
+            k = 1
             if len(sys.argv) > 4 and sys.argv[4].isdigit():
                 k = int(sys.argv[4])
             csf.classifyKNN(k=k)
@@ -341,7 +345,7 @@ def main():
 
             # Write testing vector on file
             write_test_vectors_on_file(testing_vectors, cv, f"defi1/binarized_test_flows/{appName}_binarized_test_flows.pickle")
-        
+        k = 1
         if "KNN" in sys.argv and len(sys.argv) > 4 and sys.argv[4].isdigit():
             k = int(sys.argv[4])
 
